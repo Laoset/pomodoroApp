@@ -1,0 +1,15 @@
+.circle-background {
+  stroke: #e6e6e6;
+  fill: none;
+}
+.circle-progress {
+  stroke: #007aff;
+  fill: none;
+  transition: stroke-dashoffset 1s ease-out;
+}
+.circle-text {
+  fill: #007aff;
+  font-size: 24px;
+  font-weight: bold;
+  text-anchor: middle;
+}
