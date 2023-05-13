@@ -45,10 +45,12 @@ const Timer = () => {
       switch (modeRef.current) {
         case "work":
           if (sesionsitas >= 3) {
+            showNotification();
             contexto.setSessions(sesionsitas + 1);
             next = "breaklong";
             modosnext = contexto.longBreak * 60;
           } else {
+            showNotification();
             contexto.setSessions(sesionsitas + 1);
             next = "break";
             modosnext = contexto.shortBreak * 60;
@@ -56,6 +58,7 @@ const Timer = () => {
           break;
         case "break":
           if (sesionsitas >= 1) {
+            showNotification();
             next = "work";
             modosnext = contexto.pomodoro * 60;
           } else {
