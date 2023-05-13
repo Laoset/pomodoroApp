@@ -47,7 +47,7 @@ const Timer = () => {
           if (sesionsitas >= 3) {
             contexto.setSessions(sesionsitas + 1);
             next = "breaklong";
-            modosnext = contexto.breakLong * 60;
+            modosnext = contexto.longBreak * 60;
           } else {
             contexto.setSessions(sesionsitas + 1);
             next = "break";
@@ -146,7 +146,7 @@ const Timer = () => {
   //la barrita que sigue el count
   const percentage = Math.round((seconds / totalSeconds) * 100);
   const minutos = Math.floor(seconds / 60);
-  let segunditos = seconds % 60;
+  let segunditos: any = seconds % 60;
   if (segunditos < 10) segunditos = "0" + segunditos;
 
   return (

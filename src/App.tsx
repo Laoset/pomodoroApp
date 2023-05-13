@@ -7,7 +7,7 @@ function App() {
   const [pomodoro, setPomodoro] = useState(25);
   const [shortBreak, setShortBreak] = useState(5);
   const [longBreak, setLongBreak] = useState(15);
-  const [sessions, setSessions] = useState<number>(0);
+  const [sessions, setSessions] = useState(0);
   return (
     <ContextoAll.Provider
       value={{
