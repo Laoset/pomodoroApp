@@ -5,9 +5,7 @@ import { ContextoAll } from "../Context";
 const Settings = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   //estado de erros y controlers
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState<string>("");
-  4535465;
   //consumo el context
   const contexto = useContext(ContextoAll);
   const changeWorkTime = contexto.setPomodoro;
@@ -48,6 +46,7 @@ const Settings = () => {
               <div className="border-0 rounded-xl shadow-xl relative flex flex-col xl:w-full bg-white outline-none focus:outline-none ">
                 <div className="flex items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t ">
                   <p className="text-black text-4xl font-mono">Settings</p>
+                  <p className="hidden">{error}</p>
                   <button
                     className="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
                     onClick={() => setShowModal(false)}
