@@ -5,6 +5,7 @@ import { ContextoAll } from "../Context";
 const Settings = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   //estado de erros y controlers
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState<string>("");
   4535465;
   //consumo el context
