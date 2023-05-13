@@ -11,6 +11,7 @@ import {
   showNotification,
   requestNotificationPermission,
   showNotificationPomodoro,
+  showNotificationBreak,
 } from "../util/util";
 import Modal from "./ModalFinalPomodoro";
 import { getColorFromMode } from "./Color";
@@ -66,10 +67,11 @@ const Timer = () => {
           break;
         case "break":
           if (sesionsitas >= 1) {
-            showNotificationPomodoro();
+            showNotificationBreak();
             next = "work";
             modosnext = contexto.pomodoro * 60;
           } else {
+            showNotificationBreak();
             next = "work";
             modosnext = contexto.pomodoro * 60;
             setPaused(true);
@@ -86,6 +88,7 @@ const Timer = () => {
             pausedRef.current = true;
             setOpenModal(true);
           } else {
+            showNotificationBreak();
             next = "work";
             modosnext = contexto.pomodoro * 60;
             setPaused(true);

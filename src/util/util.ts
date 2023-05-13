@@ -38,4 +38,16 @@ export function showNotificationPomodoro() {
     new Audio(sound).play();
   }
 }
+export function showNotificationBreak() {
+  if (!("Notification" in window)) {
+    return;
+  }
+
+  if (Notification.permission === "granted") {
+    new Notification("Hi!", {
+      body: "You breaktime end, its time to work !",
+    });
+    new Audio(sound).play();
+  }
+}
 export default { showNotification, requestNotificationPermission };
