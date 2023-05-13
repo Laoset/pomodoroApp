@@ -21,10 +21,21 @@ export function showNotification() {
 
   if (Notification.permission === "granted") {
     new Notification("Hi!", {
-      body: "Congratulations, you have completed 4 pomodoros.",
+      body: "Congratulations, you completed 4 pomodoros",
     });
     new Audio(sound).play();
   }
 }
+export function showNotificationPomodoro() {
+  if (!("Notification" in window)) {
+    return;
+  }
 
+  if (Notification.permission === "granted") {
+    new Notification("Hi!", {
+      body: "You completed a pomodoro",
+    });
+    new Audio(sound).play();
+  }
+}
 export default { showNotification, requestNotificationPermission };

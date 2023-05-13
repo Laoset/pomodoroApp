@@ -7,7 +7,11 @@ import {
 } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import Settings from "./Settings";
-import { showNotification, requestNotificationPermission } from "../util/util";
+import {
+  showNotification,
+  requestNotificationPermission,
+  showNotificationPomodoro,
+} from "../util/util";
 import Modal from "./ModalFinalPomodoro";
 import { getColorFromMode } from "./Color";
 
@@ -45,20 +49,24 @@ const Timer = () => {
       switch (modeRef.current) {
         case "work":
           if (sesionsitas >= 3) {
-            showNotification();
+            showNotificationPomodoro();
             contexto.setSessions(sesionsitas + 1);
             next = "breaklong";
             modosnext = contexto.longBreak * 60;
+            setPaused(true);
+            pausedRef.current = true;
           } else {
-            showNotification();
+            showNotificationPomodoro();
             contexto.setSessions(sesionsitas + 1);
             next = "break";
             modosnext = contexto.shortBreak * 60;
+            setPaused(true);
+            pausedRef.current = true;
           }
           break;
         case "break":
           if (sesionsitas >= 1) {
-            showNotification();
+            showNotificationPomodoro();
             next = "work";
             modosnext = contexto.pomodoro * 60;
           } else {
@@ -112,7 +120,7 @@ const Timer = () => {
         return switchMode();
       }
       t();
-    }, 500);
+    }, 1000);
     return () => clearInterval(inter);
   }, [contexto, modeRef, mode]);
   //funcion que inicia el timer
