@@ -1,116 +1,197 @@
-import { useState, useContext } from "react";
-import { FiSettings } from "react-icons/fi";
-import { ContextoAll } from "../Context";
+import { useSettings } from "../context/settingsContext";
+import Label from "./ui/Label";
+import Input from "./ui/Input";
+import Switch from "./ui/Switch";
+import Separator from "./ui/Separator";
+import Button from "./Button";
 
 const Settings = () => {
-  const [showModal, setShowModal] = useState<boolean>(false);
-  //estado de erros y controlers
-  const [error, setError] = useState<string>("");
-  //consumo el context
-  const contexto = useContext(ContextoAll);
-  const changeWorkTime = contexto.setPomodoro;
-  const changeShortTime = contexto.setShortBreak;
-  const changeLongTime = contexto.setLongBreak;
+  const { settings, updateSettings, resetSettings } = useSettings();
 
-  const handleChangeTime = (event: any) => {
-    if (event.target.value < 1 || event.target.value > 45) {
-      setError("Error");
-    } else {
-      changeWorkTime(Number(event.target.value));
+  const handleDurationChange = (key: keyof typeof settings, value: string) => {
+    const numValue = Number.parseInt(value);
+    if (!isNaN(numValue) && numValue > 0) {
+      updateSettings({ [key]: numValue });
     }
   };
-  const handleChangeShortTime = (event: any) => {
-    if (event.target.value < 1 || event.target.value > 45) {
-      setError("Error");
-    } else {
-      changeShortTime(Number(event.target.value));
-    }
+
+  const handleSwitchChange = (key: keyof typeof settings, checked: boolean) => {
+    updateSettings({ [key]: checked });
   };
-  const handleChangeLongTime = (event: any) => {
-    if (event.target.value < 1 || event.target.value > 45) {
-      setError("Error");
-    } else {
-      changeLongTime(Number(event.target.value));
-    }
-  };
+
   return (
-    <>
-      <FiSettings
-        className="flex h-8 w-8 justify-center cursor-pointer"
-        onClick={() => setShowModal(true)}
-      />
-      {showModal ? (
-        <>
-          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none cursor-default xl:w-auto ">
-            <div className="relative xl:w-auto my-6 mx-auto xl:max-w-3xl ">
-              <div className="border-0 rounded-xl shadow-xl relative flex flex-col xl:w-full bg-white outline-none focus:outline-none ">
-                <div className="flex items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t ">
-                  <p className="text-black text-4xl font-mono">Settings</p>
-                  <p className="hidden">{error}</p>
-                  <button
-                    className="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
-                    onClick={() => setShowModal(false)}
-                  >
-                    <span className="bg-transparent text-black opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
-                      ×
-                    </span>
-                  </button>
-                </div>
-                <div className="relative p-6 xl:flex-row flex-col flex  text-center gap-2">
-                  <label className="text-black flex flex-col xl:flex xl:flex-col">
-                    <p className="text-lg font-mono">Work</p>
-                    <input
-                      value={contexto.pomodoro}
-                      type="number"
-                      className="border-solid border-slate-700 border-2 rounded-md  px-2"
-                      onChange={handleChangeTime}
-                    />
-                  </label>
-                  <br />
-                  <label className="text-black flex flex-col xl:flex xl:flex-col">
-                    <p className="text-lg font-mono">Short Break</p>
-                    <input
-                      value={contexto.shortBreak}
-                      type="number"
-                      className="border-solid border-slate-700 border-2 rounded-md px-2"
-                      onChange={handleChangeShortTime}
-                    />
-                  </label>
-                  <br />
-                  <label className="text-black flex flex-col xl:flex lg:flex-col">
-                    <p className="text-lg font-mono">Long Break</p>
-                    <input
-                      value={contexto.longBreak}
-                      type="number"
-                      className="border-solid border-slate-700 border-2 rounded-md  px-2"
-                      onChange={handleChangeLongTime}
-                    />
-                  </label>
-                  <br />
-                </div>
-                <div className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">
-                  <button
-                    className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                    type="button"
-                    onClick={() => setShowModal(false)}
-                  >
-                    Close
-                  </button>
-                  <button
-                    className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                    type="button"
-                    onClick={() => setShowModal(false)}
-                  >
-                    Save Changes
-                  </button>
-                </div>
-              </div>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold mb-2 text-gray-800">Settings</h2>
+        <p className="text-gray-600">Customize your Pomodoro experience</p>
+      </div>
+      <div className="rounded-lg border text-card-foreground shadow-sm bg-white/80 backdrop-blur-sm border-pomodoro-blue">
+        <div className="flex flex-col space-y-1.5 p-6">
+          <h3 className="text-2xl font-semibold leading-none tracking-tight text-pomodoro-blue">
+            Timer Durations
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Set the duration for work sessions and breaks (in minutes)
+          </p>
+        </div>
+        <div className="p-6 pt-0 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="work-duration" className=" text-gray-700">
+                Work Duration
+              </Label>
+              <Input
+                id="work-duration"
+                type="number"
+                min="1"
+                max="60"
+                value={settings.workDuration}
+                onChange={(e) =>
+                  handleDurationChange("workDuration", e.target.value)
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="short-break" className="text-gray-700">
+                Short Break
+              </Label>
+              <Input
+                id="short-break"
+                type="number"
+                min="1"
+                max="30"
+                value={settings.shortBreakDuration}
+                onChange={(e) =>
+                  handleDurationChange("shortBreakDuration", e.target.value)
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="long-break" className="text-gray-700">
+                Long Break
+              </Label>
+              <Input
+                id="long-break"
+                type="number"
+                min="1"
+                max="60"
+                value={settings.longBreakDuration}
+                onChange={(e) =>
+                  handleDurationChange("longBreakDuration", e.target.value)
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="long-break-interval" className="text-gray-700">
+                Long Break Interval
+              </Label>
+              <Input
+                id="long-break-interval"
+                type="number"
+                min="2"
+                max="10"
+                value={settings.longBreakInterval}
+                onChange={(e) =>
+                  handleDurationChange("longBreakInterval", e.target.value)
+                }
+              />
             </div>
           </div>
-          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
-        </>
-      ) : null}
-    </>
+        </div>
+      </div>
+
+      <div className="rounded-lg border text-card-foreground shadow-sm bg-white/80 backdrop-blur-sm border-pomodorod-green">
+        <div className="flex flex-col space-y-1.5 p-6">
+          <h3 className="text-2xl font-semibold leading-none tracking-tight text-pomodoro-green">
+            Automation
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Configure automatic timer behavior
+          </p>
+        </div>
+        <div className="p-6 pt-0 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="auto-start-breaks" className="text-gray-700">
+                Auto-start breaks
+              </Label>
+              <p className="text-sm text-gray-600">
+                Automatically start break timers
+              </p>
+            </div>
+            <Switch
+              id="auto-start-breaks"
+              checked={settings.autoStartBreaks}
+              onCheckedChange={(checked) =>
+                handleSwitchChange("autoStartBreaks", checked)
+              }
+            />
+          </div>
+
+          <Separator />
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="auto-start-pomodoros" className="text-gray-700">
+                Auto-start work sessions
+              </Label>
+              <p className="text-sm text-gray-600">
+                Automatically start work timers after breaks
+              </p>
+            </div>
+            <Switch
+              id="auto-start-pomodoros"
+              checked={settings.autoStartPomodoros}
+              onCheckedChange={(checked) =>
+                handleSwitchChange("autoStartPomodoros", checked)
+              }
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-lg border text-card-foreground shadow-sm bg-white/80 backdrop-blur-sm border-pomodorod-green">
+        <div className="flex flex-col space-y-1.5 p-6">
+          <h3 className="text-2xl font-semibold leading-none tracking-tight text-orange-600">
+            Notifications
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Configure notification preferences
+          </p>
+        </div>
+        <div className="p-6 pt-0 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="notifications" className="text-gray-700">
+                Browser notifications
+              </Label>
+              <p className="text-sm text-gray-600">
+                Get notified when timers complete
+              </p>
+            </div>
+            <Switch
+              id="notifications"
+              checked={settings.notifications}
+              onCheckedChange={(checked) =>
+                handleSwitchChange("notifications", checked)
+              }
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <Button
+          onClick={resetSettings}
+          className="border-gray-300 hover:bg-gray-50"
+        >
+          Reset to Defaults
+        </Button>
+      </div>
+    </div>
   );
 };
 

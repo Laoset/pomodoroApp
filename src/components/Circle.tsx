@@ -1,5 +1,3 @@
-import React from "react";
-import "./Count.css";
 interface CircleProps {
   timing: number;
 }

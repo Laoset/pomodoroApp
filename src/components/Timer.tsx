@@ -1,234 +1,60 @@
-import { useState, useContext, useEffect, useRef } from "react";
-import { ContextoAll } from "../Context";
-import { HiOutlinePlay, HiOutlinePause } from "react-icons/hi2";
-import {
-  CircularProgressbarWithChildren,
-  buildStyles,
-} from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css";
-import Settings from "./Settings";
-import {
-  showNotification,
-  requestNotificationPermission,
-  showNotificationPomodoro,
-  showNotificationBreak,
-} from "../util/util";
-import Modal from "./ModalFinalPomodoro";
-import { getColorFromMode } from "./Color";
+import { usePomodoro } from "../context/context";
+import Controllers from "./Controllers";
+import Card from "./ui/Card";
 
-const Timer = () => {
-  //usamos el contexto y lo declarmos como const
-  const contexto = useContext(ContextoAll);
-  //me traigo las sesiones para sumar
-  const sesionsitas = contexto.sessions;
-  //estado de pausa
-  const [paused, setPaused] = useState<boolean>(true);
-  //estado para open el modal
-  const [openModal, setOpenModal] = useState<boolean>(false);
-  //estado de modos
-  const [mode, setMode] = useState<string>("work");
-  //estado de segundos que seran descontado
-  const [seconds, setSeconds] = useState<number>(0);
-  //ref
-  const secondsLeftRef = useRef(seconds);
-  const pausedRef = useRef(paused);
-  const modeRef = useRef(mode);
-  //util de color mode
-  const colors = getColorFromMode(mode);
-  //f
-  const t = () => {
-    secondsLeftRef.current--;
-    setSeconds(secondsLeftRef.current);
+export const Timer = () => {
+  const { timeLeft, mode, status, completedPomodoros } = usePomodoro();
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
   };
-  //effect
-  useEffect(() => {
-    inicializador();
-    //funcion que cambia el modo
-    const switchMode = () => {
-      let next;
-      let modosnext;
-      switch (modeRef.current) {
-        case "work":
-          if (sesionsitas >= 3) {
-            showNotificationPomodoro();
-            contexto.setSessions(sesionsitas + 1);
-            next = "breaklong";
-            modosnext = contexto.longBreak * 60;
-            setPaused(true);
-            pausedRef.current = true;
-          } else {
-            showNotificationPomodoro();
-            contexto.setSessions(sesionsitas + 1);
-            next = "break";
-            modosnext = contexto.shortBreak * 60;
-            setPaused(true);
-            pausedRef.current = true;
-          }
-          break;
-        case "break":
-          if (sesionsitas >= 1) {
-            showNotificationBreak();
-            next = "work";
-            modosnext = contexto.pomodoro * 60;
-          } else {
-            showNotificationBreak();
-            next = "work";
-            modosnext = contexto.pomodoro * 60;
-            setPaused(true);
-            pausedRef.current = true;
-          }
-          break;
-        case "breaklong":
-          if (sesionsitas >= 3) {
-            contexto.setSessions(0);
-            showNotification();
-            next = "work";
-            modosnext = contexto.pomodoro * 60;
-            setPaused(true);
-            pausedRef.current = true;
-            setOpenModal(true);
-          } else {
-            showNotificationBreak();
-            next = "work";
-            modosnext = contexto.pomodoro * 60;
-            setPaused(true);
-            pausedRef.current = true;
-          }
-          break;
-        default:
-          next = "work";
-          modosnext = contexto.pomodoro * 60;
-          break;
-      }
-      setMode(next);
-      modeRef.current = next;
-      setSeconds(modosnext);
-      secondsLeftRef.current = modosnext;
-    };
-    if (modeRef.current === "work") {
-      secondsLeftRef.current = contexto.pomodoro * 60;
+  const getModeColor = () => {
+    switch (mode) {
+      case "work":
+        return "bg-pomodoro-red hover:bg-pomodoro-red timer-circle shadow-pomodoro-red/30";
+      case "shortBreak":
+        return "bg-pomodoro-green hover:bg-pomodoro-green timer-circle shadow-pomodoro-green/30";
+      case "longBreak":
+        return "bg-pomodoro-blue hover:bg-pomodoro-blue timer-circle shadow-pomodoro-blue/30";
+      default:
+        return "bg-pomodoro-red hover:bg-pomodoro-red timer-circle shadow-pomodoro-red/30";
     }
-    if (modeRef.current === "break") {
-      secondsLeftRef.current = contexto.shortBreak * 60;
+  };
+
+  const getStatusAnimation = () => {
+    if (status === "running") {
+      return "animate-pulse-soft";
     }
-    if (modeRef.current === "breaklong") {
-      secondsLeftRef.current = contexto.longBreak * 60;
-    }
-    setSeconds(secondsLeftRef.current);
-    const inter = setInterval(() => {
-      if (pausedRef.current) {
-        return;
-      }
-      if (secondsLeftRef.current === 0) {
-        return switchMode();
-      }
-      t();
-    }, 1000);
-    return () => clearInterval(inter);
-  }, [contexto, modeRef, mode]);
-  //funcion que inicia el timer
-  const inicializador = () => {
-    setSeconds(contexto.pomodoro * 60);
+    return "";
   };
-  const handleChangeWorkTime = () => {
-    setMode("work");
-    modeRef.current = "work";
-  };
-  const handleChangeShortTime = () => {
-    setMode("break");
-    modeRef.current = "break";
-  };
-  const handleChangeLongTime = () => {
-    setMode("breaklong");
-    modeRef.current = "breaklong";
-  };
-  let totalSeconds;
-  switch (mode) {
-    case "work":
-      totalSeconds = contexto.pomodoro * 60;
-      break;
-    case "break":
-      totalSeconds = contexto.shortBreak * 60;
-      break;
-    case "breaklong":
-      totalSeconds = contexto.longBreak * 60;
-      break;
-    default:
-      totalSeconds = contexto.pomodoro * 60;
-      break;
-  }
-  //la barrita que sigue el count
-  const percentage = Math.round((seconds / totalSeconds) * 100);
-  const minutos = Math.floor(seconds / 60);
-  let segunditos: any = seconds % 60;
-  if (segunditos < 10) segunditos = "0" + segunditos;
 
   return (
-    <div className="flex flex-col justify-center xl:h-[40rem] h-full w-full items-center">
-      <nav className="flex flex-row gap-5 text-xl xl:mb-20 mb-10 h-14 bg-[#1b263b] shadow-lg shadow-slate-700 rounded-md w-96 place-content-center">
-        <button
-          className="hover:text-[#eabf9f] hover:scale-110 duration-200 rounded-md"
-          onClick={handleChangeWorkTime}
-        >
-          Work
-        </button>
-        <button
-          className="hover:text-[#eabf9f] hover:scale-110 duration-200 rounded-md"
-          onClick={handleChangeShortTime}
-        >
-          Short Break
-        </button>
-        <button
-          className="hover:text-[#eabf9f] hover:scale-110 duration-200 rounded-md"
-          onClick={handleChangeLongTime}
-        >
-          Long Break
-        </button>
-      </nav>
-      <div className="mb-5 ">
-        <Settings />
-      </div>
-      {openModal ? <Modal /> : null}
-      <article className="flex flex-col items-center gap-2">
-        <div>
-          <CircularProgressbarWithChildren
-            value={percentage}
-            styles={buildStyles({
-              pathColor: colors,
-              trailColor: "rgba(255,255,255,.2)",
-            })}
-          >
-            <p className="text-[#eabf9f] text-6xl mb-6">
-              {minutos + ":" + segunditos}
-            </p>
-            <p>
-              Pomodoro completed : <span>{sesionsitas}</span>
-            </p>
-          </CircularProgressbarWithChildren>
+    <Card className="mt-2 p-6">
+      <div className="text-center space-y-8">
+        <article className="flex flex-col items-center gap-2">
+          <div className="space-y-4 flex justify-center items-center flex-col">
+            <div
+              className={`mx-auto w-80 h-80 rounded-full ${getModeColor()} ${getStatusAnimation()} flex items-center justify-center shadow-2xl`}
+            >
+              <div className="text-white">
+                <div className="text-6xl font-mono font-bold mb-2">
+                  {formatTime(timeLeft)}
+                </div>
+                <div className="text-xl opacity-90">
+                  Session {completedPomodoros + 1}
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+        <div className="flex justify-center gap-4">
+          <Controllers />
         </div>
-      </article>
-      <div className="flex flex-row gap-4 items-center mt-2">
-        {paused ? (
-          <HiOutlinePlay
-            className="flex h-16 w-16  justify-center cursor-pointer"
-            onClick={() => {
-              requestNotificationPermission();
-              setPaused(false);
-              pausedRef.current = false;
-            }}
-          />
-        ) : (
-          <HiOutlinePause
-            className="flex h-16 w-16  justify-center cursor-pointer"
-            onClick={() => {
-              setPaused(true);
-              pausedRef.current = true;
-            }}
-          />
-        )}
       </div>
-    </div>
+    </Card>
   );
 };
-
-export default Timer;
