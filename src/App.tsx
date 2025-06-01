@@ -1,4 +1,4 @@
-import { BsGithub, BsLinkedin } from "react-icons/bs";
+// import { BsGithub, BsLinkedin } from "react-icons/bs";
 import { PomodoroProvider } from "./context/context";
 import TabList from "./components/TabList";
 import { useState } from "react";
