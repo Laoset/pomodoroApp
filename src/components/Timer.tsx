@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 import { usePomodoro } from "../context/context";
 import Controllers from "./Controllers";
 import Card from "./ui/Card";
@@ -31,30 +32,38 @@ export const Timer = () => {
     }
     return "";
   };
-
   return (
-    <Card className="mt-2 p-6">
-      <div className="text-center space-y-8">
-        <article className="flex flex-col items-center gap-2">
-          <div className="space-y-4 flex justify-center items-center flex-col">
-            <div
-              className={`mx-auto w-80 h-80 rounded-full ${getModeColor()} ${getStatusAnimation()} flex items-center justify-center shadow-2xl`}
-            >
-              <div className="text-white">
-                <div className="text-6xl font-mono font-bold mb-2">
-                  {formatTime(timeLeft)}
-                </div>
-                <div className="text-xl opacity-90">
-                  Session {completedPomodoros + 1}
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{
+        duration: 0.4,
+        ease: "easeInOut",
+      }}
+    >
+      <Card className="p-6">
+        <div className="text-center space-y-8">
+          <article className="flex flex-col items-center gap-2">
+            <div className="space-y-4 flex justify-center items-center flex-col">
+              <div
+                className={`mx-auto w-72 h-72 rounded-full ${getModeColor()} ${getStatusAnimation()} flex items-center justify-center shadow-2xl`}
+              >
+                <div className="text-white">
+                  <h3 className="text-6xl font-bold tracking-wide">
+                    {formatTime(timeLeft)}
+                  </h3>
+                  <p className="text-base opacity-90 tracking-wide">
+                    Session {completedPomodoros + 1}
+                  </p>
                 </div>
               </div>
             </div>
+          </article>
+          <div className="flex justify-center gap-4">
+            <Controllers />
           </div>
-        </article>
-        <div className="flex justify-center gap-4">
-          <Controllers />
         </div>
-      </div>
-    </Card>
+      </Card>
+    </motion.div>
   );
 };

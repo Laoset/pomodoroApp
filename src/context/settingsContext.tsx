@@ -1,12 +1,10 @@
-'use client';
-
 import {
   createContext,
   useContext,
   useEffect,
   useState,
   type ReactNode,
-} from 'react';
+} from "react";
 
 interface Settings {
   workDuration: number;
@@ -42,12 +40,12 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<Settings>(defaultSettings);
 
   useEffect(() => {
-    const savedSettings = localStorage.getItem('pomodoro-settings');
+    const savedSettings = localStorage.getItem("pomodoro-settings");
     if (savedSettings) {
       try {
         setSettings(JSON.parse(savedSettings));
       } catch (error) {
-        console.error('Error loading settings:', error);
+        console.error("Error loading settings:", error);
       }
     }
   }, []);
@@ -55,12 +53,12 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const updateSettings = (newSettings: Partial<Settings>) => {
     const updatedSettings = { ...settings, ...newSettings };
     setSettings(updatedSettings);
-    localStorage.setItem('pomodoro-settings', JSON.stringify(updatedSettings));
+    localStorage.setItem("pomodoro-settings", JSON.stringify(updatedSettings));
   };
 
   const resetSettings = () => {
     setSettings(defaultSettings);
-    localStorage.setItem('pomodoro-settings', JSON.stringify(defaultSettings));
+    localStorage.setItem("pomodoro-settings", JSON.stringify(defaultSettings));
   };
 
   return (
@@ -75,7 +73,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 export function useSettings() {
   const context = useContext(SettingsContext);
   if (context === undefined) {
-    throw new Error('useSettings must be used within a SettingsProvider');
+    throw new Error("useSettings must be used within a SettingsProvider");
   }
   return context;
 }

@@ -1,5 +1,3 @@
-'use client';
-
 import {
   createContext,
   useContext,
@@ -7,12 +5,13 @@ import {
   useState,
   type ReactNode,
   useCallback,
-} from 'react';
-import { useSettings } from './settingsContext';
-import { useHistory } from './historyContext';
+} from "react";
+import { useSettings } from "./settingsContext";
+import { useHistory } from "./historyContext";
+import notificationSound from "../assets/mixkit-bell-notification-933.wav";
 
-type TimerMode = 'work' | 'shortBreak' | 'longBreak';
-type TimerStatus = 'idle' | 'running' | 'paused';
+type TimerMode = "work" | "shortBreak" | "longBreak";
+type TimerStatus = "idle" | "running" | "paused";
 
 interface PomodoroContextType {
   timeLeft: number;
@@ -33,19 +32,19 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
   const { settings } = useSettings();
   const { addHistoryEntry } = useHistory();
 
-  const [mode, setMode] = useState<TimerMode>('work');
-  const [status, setStatus] = useState<TimerStatus>('idle');
+  const [mode, setMode] = useState<TimerMode>("work");
+  const [status, setStatus] = useState<TimerStatus>("idle");
   const [timeLeft, setTimeLeft] = useState(settings.workDuration * 60);
   const [completedPomodoros, setCompletedPomodoros] = useState(0);
 
   const getDurationForMode = useCallback(
     (currentMode: TimerMode) => {
       switch (currentMode) {
-        case 'work':
+        case "work":
           return settings.workDuration * 60;
-        case 'shortBreak':
+        case "shortBreak":
           return settings.shortBreakDuration * 60;
-        case 'longBreak':
+        case "longBreak":
           return settings.longBreakDuration * 60;
         default:
           return settings.workDuration * 60;
@@ -55,13 +54,13 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
   );
 
   const getNextMode = useCallback(() => {
-    if (mode === 'work') {
+    if (mode === "work") {
       const nextPomodoroCount = completedPomodoros + 1;
       return nextPomodoroCount % settings.longBreakInterval === 0
-        ? 'longBreak'
-        : 'shortBreak';
+        ? "longBreak"
+        : "shortBreak";
     }
-    return 'work';
+    return "work";
   }, [mode, completedPomodoros, settings.longBreakInterval]);
 
   const switchMode = useCallback(() => {
@@ -75,7 +74,7 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
       completed: wasCompleted,
     });
 
-    if (mode === 'work' && wasCompleted) {
+    if (mode === "work" && wasCompleted) {
       setCompletedPomodoros((prev) => prev + 1);
     }
 
@@ -85,24 +84,28 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
 
     // Auto-start next session if enabled
     if (
-      (nextMode !== 'work' && settings.autoStartBreaks) ||
-      (nextMode === 'work' && settings.autoStartPomodoros)
+      (nextMode !== "work" && settings.autoStartBreaks) ||
+      (nextMode === "work" && settings.autoStartPomodoros)
     ) {
-      setStatus('running');
+      setStatus("running");
     } else {
-      setStatus('idle');
+      setStatus("idle");
     }
 
     // Show notification
-    if (settings.notifications && 'Notification' in window) {
+    if (settings.notifications && "Notification" in window) {
       const messages = {
-        work: 'Break time! Take a rest.',
-        shortBreak: 'Break over! Time to focus.',
-        longBreak: 'Long break over! Ready to work?',
+        work: "Break time! Take a rest.",
+        shortBreak: "Break over! Time to focus.",
+        longBreak: "Long break over! Ready to work?",
       };
-      new Notification('Pomodoro Timer', {
-        body: messages[nextMode],
-        icon: '/favicon.ico',
+      new Notification("Pomodoro Timer", {
+        body: messages[mode],
+        // icon: "/favicon.ico",
+      });
+      const audio = new Audio(notificationSound);
+      audio.play().catch((err) => {
+        console.warn("No se pudo reproducir el sonido:", err);
       });
     }
   }, [
@@ -117,41 +120,40 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     setTimeLeft(getDurationForMode(mode));
   }, [settings, mode, getDurationForMode]);
-
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: number;
 
-    if (status === 'running' && timeLeft > 0) {
+    if (status === "running" && timeLeft > 0) {
       interval = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            switchMode();
-            return 0;
-          }
-          return prev - 1;
-        });
+        setTimeLeft((prev) => Math.max(prev - 1, 0));
       }, 1000);
     }
 
     return () => clearInterval(interval);
-  }, [status, timeLeft, switchMode]);
+  }, [status, timeLeft]);
+
+  useEffect(() => {
+    if (status === "running" && timeLeft === 0) {
+      switchMode();
+    }
+  }, [timeLeft, status, switchMode]);
 
   // Request notification permission
   useEffect(() => {
     if (
       settings.notifications &&
-      'Notification' in window &&
-      Notification.permission === 'default'
+      "Notification" in window &&
+      Notification.permission === "default"
     ) {
       Notification.requestPermission();
     }
   }, [settings.notifications]);
 
-  const startTimer = () => setStatus('running');
-  const pauseTimer = () => setStatus('paused');
+  const startTimer = () => setStatus("running");
+  const pauseTimer = () => setStatus("paused");
 
   const resetTimer = () => {
-    setStatus('idle');
+    setStatus("idle");
     setTimeLeft(getDurationForMode(mode));
   };
 
@@ -181,7 +183,7 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
 export function usePomodoro() {
   const context = useContext(PomodoroContext);
   if (context === undefined) {
-    throw new Error('usePomodoro must be used within a PomodoroProvider');
+    throw new Error("usePomodoro must be used within a PomodoroProvider");
   }
   return context;
 }

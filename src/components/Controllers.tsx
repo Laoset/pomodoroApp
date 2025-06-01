@@ -14,27 +14,21 @@ const Controllers = () => {
     <div className="flex justify-center gap-4">
       {status === "idle" || status === "paused" ? (
         <Button
-          className="bg-primary hover:bg-gray-800 text-white cursor-pointer"
+          className="bg-primary hover:bg-gray-800 text-white cursor-pointer p-1"
           onClick={startTimer}
         >
           <IoPlayOutline className="h-6 w-6" />
-          {/* <span className="text-sm">
-            {status === "idle" ? "Start" : "Resume"}
-          </span> */}
         </Button>
       ) : (
-        <Button onClick={pauseTimer} className="cursor-pointer">
+        <Button onClick={pauseTimer} className="cursor-pointer p-1">
           <IoPauseOutline className="h-6 w-6" />
-          {/* <span className="text-sm">Pause</span> */}
         </Button>
       )}
-      <Button onClick={resetTimer} className="cursor-pointer">
+      <Button onClick={resetTimer} className="cursor-pointer p-1">
         <IoPauseOutline className="h-6 w-6" />
-        {/* <span className="text-sm">Reset</span> */}
       </Button>
-      <Button onClick={skipTimer} className="cursor-pointer">
+      <Button onClick={skipTimer} className="cursor-pointer p-1">
         <IoPlaySkipForwardOutline className="h-6 w-6" />
-        {/* <span className="text-sm">Skip</span> */}
       </Button>
     </div>
   );

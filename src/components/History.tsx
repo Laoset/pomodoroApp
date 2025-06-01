@@ -47,14 +47,7 @@ const History = () => {
   const todayStats = getTodayStats();
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Task History</h2>
-        <p className="text-gray-600">
-          Track your productivity and completed sessions
-        </p>
-      </div>
-
+    <div className="space-y-6 h-full overflow-y-scroll">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="p-4 text-center">

@@ -20,8 +20,8 @@ function App() {
     <SettingsProvider>
       <HistoryProvider>
         <PomodoroProvider>
-          <div className="min-h-screen px-4 py-10 bg-bg">
-            <div className="max-w-3xl mx-auto">
+          <div className="min-h-screen h-screen px-4 py-10 bg-bg overflow-hidden">
+            <div className="mx-auto max-w-2xl h-full">
               <header className="text-center mb-12">
                 <Card className="p-4">
                   <h1 className="text-4xl font-black text-primary mb-6">
@@ -30,7 +30,7 @@ function App() {
                   <TabList onSection={handleSectionChange} section={section} />
                 </Card>
               </header>
-              <section className="w-full h-full">
+              <section className="w-full h-[calc(100vh-300px)] overflow-hidden">
                 {renderSection(section)}
               </section>
             </div>
